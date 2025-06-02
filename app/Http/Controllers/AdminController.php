@@ -25,6 +25,7 @@ class AdminController extends Controller
         return back()->with('success', 'User deleted');
     }
 
+    
     public function show($id)
 {
     $user = User::with('posts')->findOrFail($id);

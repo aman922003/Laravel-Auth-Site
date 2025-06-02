@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\FacebookController;
+use App\Http\Controllers\GoogleController;
 use App\Mail\LoginNotification;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
@@ -64,3 +66,7 @@ Route::delete('/likes/{id}', [AdminController::class, 'Likedestroy'])->name('lik
 
 Route::post('/posts/{post}/toggle-save', [PostController::class, 'toggleSave'])->name('posts.toggleSave');
 Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+
+Route::get('redirect-google',[GoogleController::class,'index'])->name('redirect-google');
+Route::get('callback-google',[GoogleController::class,'callback']);
+Route::get('/home', [HomeController::class, 'index'])->name('home');

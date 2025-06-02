@@ -17,6 +17,7 @@ class User extends Authenticatable
         'password',
         'role',
         'profile_photo',
+        'facebook_id',
     ];
 
     // Posts created by the user
