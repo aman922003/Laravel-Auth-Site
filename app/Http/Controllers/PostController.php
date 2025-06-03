@@ -24,9 +24,7 @@ public function toggleLike(Request $request, $postId)
     {
         $post = Post::findOrFail($postId);
         $user = Auth::user();
-
         $like = $post->likes()->where('user_id', $user->id)->first();
-
         if ($like) {
             $like->delete();
             $liked = false;
@@ -34,7 +32,6 @@ public function toggleLike(Request $request, $postId)
             $post->likes()->create(['user_id' => $user->id]);
             $liked = true;
         }
-
         return response()->json([
             'liked' => $liked,
             'likes_count' => $post->likes()->count()
@@ -61,7 +58,6 @@ public function toggleLike(Request $request, $postId)
             'content' => 'required',
             'image' => 'nullable|image|max:5000'
         ]);
-
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('posts', 'public');
@@ -71,7 +67,6 @@ public function toggleLike(Request $request, $postId)
             'content' => $request->content,
             'image' => $imagePath,
         ]);
-
         return redirect()->route('posts.index')->with('success', 'Post created');
     }
 
@@ -79,16 +74,6 @@ public function toggleLike(Request $request, $postId)
         return view('posts.edit', compact('post'));
     }
 
-    // public function update(Request $request, Post $post) {
-    //     $request->validate([
-    //         'title' => 'required|string|max:255',
-    //         'content' => 'required|string',
-    //         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-    //     ]);
-
-    //     $post->update($request->only('title', 'content'));
-    //     return redirect()->route('posts.index')->with('success', 'Post updated');
-    // }
     public function update(Request $request, Post $post)
 {
     $request->validate([

@@ -1,0 +1,124 @@
+✅ Essential Topics for Laravel 12 Live Projects
+🏗️ 1. Project Setup & Configuration
+Environment Configuration (.env)
+
+File structure overview (routes, app, resources, etc.)
+
+Composer & Artisan basics
+
+Storage setup & php artisan storage:link
+
+👤 2. Authentication & Authorization
+Laravel Breeze / Jetstream / Fortify
+
+Login, Register, Logout
+
+Auth middleware (Auth::check(), Auth::user())
+
+Role-based access control (using gates or policies)
+
+Protecting routes with auth middleware
+
+🗃️ 3. Database & Eloquent ORM
+Migrations, Seeders, Factories
+
+Relationships: hasOne, hasMany, belongsTo, belongsToMany
+
+Query Builder vs Eloquent
+
+Eager Loading (with())
+
+📩 4. Form Handling & Validation
+@csrf token
+
+$request->validate([...])
+
+File uploads ($request->file(), store())
+
+Old input & validation error handling
+
+📬 5. Email & Notifications
+Sending emails via Mailable classes
+
+Markdown email templates
+
+Scheduling emails (via task scheduling / cron)
+
+Sending notifications (via Mail, Database, Broadcast)
+
+📅 6. Task Scheduling & Queues
+php artisan schedule:run
+
+Creating custom scheduled commands
+
+Laravel Queues for email, notifications, and jobs
+
+ShouldQueue interface & dispatch() method
+
+🛡️ 7. Middleware
+Using built-in middleware (auth, verified, throttle)
+
+Creating custom middleware (php artisan make:middleware)
+
+$next($request) usage
+
+🧾 8. Blade Templating
+Blade syntax: @if, @foreach, @include, @yield, @section
+
+Components and Layouts
+
+Passing data from controller to views
+
+🧠 9. Route Management
+Basic & resource routes
+
+Route groups (middleware, prefix)
+
+Named routes (route('posts.show', $post))
+
+🌐 10. APIs (If your site has frontend/backend separation)
+RESTful resource controllers
+
+API routes (routes/api.php)
+
+Authentication via Sanctum / Passport
+
+JSON responses and status codes
+
+🖼️ 11. File Uploads & Storage
+Public vs private files
+
+Disk configuration in config/filesystems.php
+
+Uploading and retrieving images
+
+store(), storeAs(), Storage::url()
+
+🗂️ 12. Admin Panel / User Dashboard
+Separate dashboards for user/admin
+
+Admin middleware and route protection
+
+Managing users, posts, etc.
+
+💡 Bonus Topics (Useful in Live Projects)
+Livewire or Inertia.js for dynamic interfaces
+
+Spatie Roles & Permissions package
+
+Socialite for social login (Google, GitHub, etc.)
+
+Debugging with Laravel Telescope
+
+Deployment (Laravel Forge, shared hosting, Docker)
+
+✅ Project Example Ideas
+If you're looking to apply these topics:
+
+Blog system with user login & post management
+
+E-commerce site with cart, checkout, order history
+
+Job board with admin dashboard
+
+Online course platform (videos + quiz + enrollments)

@@ -21,8 +21,9 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
-    public function register(Request $request) {
-        try{
+    public function register(Request $request)
+    {
+        try {
 
             $request->validate([
                 'name' => 'required',
@@ -31,7 +32,7 @@ class AuthController extends Controller
                 'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:5000',
             ]);
             $profilePhotoPath = null;
-            
+
             if ($request->hasFile('profile_photo')) {
                 $profilePhotoPath = $request->file('profile_photo')->store('profile_photos', 'public');
             }
@@ -43,9 +44,9 @@ class AuthController extends Controller
                 'profile_photo' => $profilePhotoPath,
                 'role' => 'user',
             ]);
-            
+
             return redirect('/login')->with('success', 'Registered successfully');
-        }catch(Exception $e){
+        } catch (Exception $e) {
             dd($e->getMessage());
         }
     }
@@ -55,44 +56,30 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    // public function login(Request $request)
-    // {
-    //     $request->validate([
-    //         'email' => 'required|email',
-    //         'password' => 'required',
-    //     ]);
-
-    //     if (Auth::attempt($request->only('email', 'password'), $request->filled('remember'))) {
-    //         return redirect()->route('home');
-    //     }
-    //     return back()->withErrors(['email' => 'Invalid credentials'])->withInput();
-    // }
-
-    public function login(Request $request) {
-        try {
-            $credentials = $request->only('email', 'password');
-      
-            if (Auth::attempt($credentials, $request->filled('remember'))) {
-                $user = Auth::user();
-            
-                if ($user->role !== $request->role) {
-                    Auth::logout();
-                    return back()->with('error', 'Selected role does not match your account role.');
-                }
-            
-               Mail::to($user->email)->send(new LoginNotification($user));
-            
-                return $user->role === 'admin'
-                    ? redirect()->route('admin.dashboard')
-                    : redirect()->route('user.dashboard');
-            }
-            
-            return back()->with('error', 'Invalid email or password.');
-        } catch (Exception $e) {
-            return back()->with('error', 'Something went wrong. Please try again.');
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|string|min:6'
+        ]);
+        $user = User::where('email', $request->email)->first();
+        $credentials = $request->only('email', 'password');
+        // Attempt to authenticate the user
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            Mail::to($user->email)->send(new LoginNotification($user));
+            return match ($user->role) {
+                'admin' => redirect()->route('admin.dashboard'),
+                'user' => redirect()->route('user.dashboard'),
+                default => redirect()->route('home')->with('error', 'Unauthorized role.'),
+            };
         }
+
+        return back()->with('error', 'Invalid email or password.');
     }
-    
+
+
+
 
     public function logout()
     {

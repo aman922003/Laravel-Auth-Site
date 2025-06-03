@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use Str;
 
 class GoogleController extends Controller
 {
@@ -13,31 +14,36 @@ class GoogleController extends Controller
     {
         // return Socialite::driver('google')->redirect();
         return Socialite::driver('google')
-        ->with(['prompt' => 'select_account']) 
-        ->redirect();
+            ->with(['prompt' => 'select_account'])
+            ->redirect();
     }
 
     public function callback()
-{
-    $googleUser = Socialite::driver('google')->stateless()->user();
-    $user = User::where('google_id', $googleUser->id)->first();
+    {
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->user();
 
-    if (!$user) {
-        $user = User::where('email', $googleUser->email)->first();
+            // Check if user exists with google_id
+            $user = User::where('email', $googleUser->email)->first();
 
-        if ($user) {
-            $user->google_id = $googleUser->id;
-            $user->save();
-        } else {
-            $user = User::create([
-                'name' => $googleUser->name,
-                'email' => $googleUser->email,
-                'google_id' => $googleUser->id,
-                'password' => Hash::make('default_password'), // Password is just a placeholder
-            ]);
+            if (!$user) {
+                $user = User::updateOrCreate([
+                    'email' => $googleUser->email
+                ], [
+                    'name' => $googleUser->name,
+                    'email' => $googleUser->email,
+                    'google_id' => $googleUser->id,
+                    'password' => bcrypt(Str::random(16)),
+                ]);
+            } else {
+                if ($user) {
+                    Auth::login($user);
+                    return redirect('/')->with('status', 'Logged in successfully with Google.');
+                }
+            }
+            return redirect('/login')->with('status', 'Google account linked. Please log in.');
+        } catch (Exception $e) {
+            return redirect('/login')->with('error', 'Authentication failed: ' . $e->getMessage());
         }
     }
-    Auth::login($user);
-    return redirect('/');
-}
 }
