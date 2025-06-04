@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\PostReviewController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
@@ -9,9 +11,7 @@ use App\Http\Controllers\{
     PostController,
     UserController,
     AdminController,
-    FacebookController,
     GoogleController,
-    CommentController
 };
 use App\Http\Controllers\AdminPostController;
 use App\Http\Controllers\Frontend\HomeController;
@@ -76,6 +76,9 @@ Route::middleware(['auth'])->group(function () {
 
     // View user profile
     Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+
+    // Rating and Reviews
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
 
@@ -94,12 +97,16 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
     Route::get('/users/{id}', [AdminController::class, 'show'])->name('users.show');
 
     // Manage posts
-    Route::get('/posts/{post}/edit', [AdminPostController::class, 'edit'])->name('posts.edit');
-    Route::put('/posts/{post}', [AdminPostController::class, 'update'])->name('posts.update');
-    Route::delete('/posts/{post}', [AdminPostController::class, 'destroy'])->name('posts.destroy');
+    Route::get('/posts/{post}/edit', [AdminController::class, 'adminPosts'])->name('posts.edit');
+    Route::put('/posts/{post}', [AdminController::class, 'adminPosts'])->name('posts.update');
+    Route::delete('/posts/{post}', [AdminController::class, 'adminPostsDelete'])->name('posts.destroy');
     Route::get('/posts/{id}', [AdminController::class, 'showPost'])->name('posts.show');
 
     // Manage comments and likes
     Route::delete('/comments/{comment}', [AdminController::class, 'Commentdestroy'])->name('comments.destroy');
     Route::delete('/likes/{id}', [AdminController::class, 'Likedestroy'])->name('likes.destroy');
 });
+
+Route::put('/reviews/{id}', [ReviewController::class, 'update'])->name('reviews.update');
+Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+

@@ -2705,3 +2705,34 @@ section,
 }
 
 
+
+/* Review and Rating CSS */
+
+.rating-stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.2rem;
+    width: fit-content; /* ensures it doesn't stretch */
+    margin-top: 0.25rem;
+}
+
+
+.rating-stars input {
+    display: none;
+}
+
+.rating-stars label {
+    font-size: 2rem;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 0 4px;
+}
+
+.rating-stars input:checked ~ label,
+.rating-stars label:hover,
+.rating-stars label:hover ~ label {
+    color: #ffc107; /* Bootstrap's warning color */
+}

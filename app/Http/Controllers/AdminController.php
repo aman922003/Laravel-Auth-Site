@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
-use App\Models\Like;
-use App\Models\User;
-use App\Models\Post;
+use App\Models\{
+    Comment,
+    Like,
+    User,
+    Post
+};
 use App\Helpers\Helper;
+use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
@@ -56,4 +59,9 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Like removed successfully.');
     }
 
+    public function adminPostsDelete(Request $request, Post $post)
+    {
+        $post->delete();
+        return back()->with('success', 'Post deleted');
+    }
 }
