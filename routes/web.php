@@ -68,9 +68,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/posts/{post}/toggle-save', [PostController::class, 'toggleSave'])->name('posts.toggleSave');
 
     // Comments
-    Route::post('/posts/{post}/comment', [CommentController::class, 'store'])->name('posts.comment');
-    Route::get('/comments/{comment}/edit', [CommentController::class, 'edit'])->name('comments.edit');
-    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
+    Route::post('/posts/{post}/comment', [PostController::class, 'storeComment'])->name('posts.comment');
 
     // User Dashboard
     Route::get('/user/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard')->middleware('is_user');

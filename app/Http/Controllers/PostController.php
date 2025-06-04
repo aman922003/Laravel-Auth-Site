@@ -4,23 +4,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Like;
+use App\Helpers\Helper;
+use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         // $posts = Auth::user()->posts;
         // $posts = Post::all();
         $posts = Post::with('user')->latest()->paginate(6); // 6 posts per page
         return view('posts.index', compact('posts'));
     }
 
-
-public function toggleLike(Request $request, $postId)
+    public function toggleLike(Request $request, $postId)
     {
         $post = Post::findOrFail($postId);
         $user = Auth::user();
@@ -38,21 +38,23 @@ public function toggleLike(Request $request, $postId)
         ]);
     }
 
-    public function create() {
+    public function create()
+    {
         return view('posts.create');
     }
 
     public function show($id)
-{
-    // $post = Post::findOrFail($id);
-    // $like = Like::all($id);
-    $post = Post::with(['user', 'comments.user', 'likes'])->findOrFail($id);
-    return view('posts.show', ['post' => $post]);
-    // return view('posts.show', ['like' => $like]);
+    {
+        // $post = Post::findOrFail($id);
+        // $like = Like::all($id);
+        $post = Post::with(['user', 'comments.user', 'likes'])->findOrFail($id);
+        return view('posts.show', ['post' => $post]);
+        // return view('posts.show', ['like' => $like]);
 
-}
+    }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $request->validate([
             'title' => 'required',
             'content' => 'required',
@@ -70,46 +72,63 @@ public function toggleLike(Request $request, $postId)
         return redirect()->route('posts.index')->with('success', 'Post created');
     }
 
-    public function edit(Post $post) {
+    public function edit(Post $post)
+    {
         return view('posts.edit', compact('post'));
     }
 
     public function update(Request $request, Post $post)
-{
-    $request->validate([
-        'title' => 'required|string|max:255',
-        'content' => 'required|string',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-    ]);
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+        ]);
 
-    $post->title = $request->title;
-    $post->content = $request->content;
-    if ($request->hasFile('image')) {
-        if ($post->image && Storage::disk('public')->exists($post->image)) {
-            Storage::disk('public')->delete($post->image);
+        $post->title = $request->title;
+        $post->content = $request->content;
+        if ($request->hasFile('image')) {
+            Helper::deletePostAssets($post);
+            $path = $request->file('image')->store('uploads', 'public');
+            $post->image = $path;
         }
-        $path = $request->file('image')->store('uploads', 'public');
-        $post->image = $path;
+        $post->save();
+        return redirect()->route('posts.index')->with('success', 'Post updated');
     }
-    $post->save();
-    return redirect()->route('posts.index')->with('success', 'Post updated');
-}
 
-    public function destroy(Post $post) {
+    public function destroy(POST $post)
+    {
+        Helper::deletePostAssets($post); // Delete Post image from storage.
         $post->delete();
         return back()->with('success', 'Post deleted');
     }
 
     public function toggleSave(Post $post)
-{
-    $user = auth()->user();
-    if ($user->savedPosts->contains($post->id)) {
-        $user->savedPosts()->detach($post->id);
-    } else {
-        $user->savedPosts()->attach($post->id);
+    {
+        $user = auth()->user();
+        if ($user->savedPosts->contains($post->id)) {
+            $user->savedPosts()->detach($post->id);
+        } else {
+            $user->savedPosts()->attach($post->id);
+        }
+
+        return back();
     }
 
-    return back();
-}
+    public function storeComment(Request $request)
+    {
 
+        $request->validate([
+            'content' => 'required|string|max:1000',
+            'post_id' => 'required|exists:posts,id',
+        ]);
+
+        Comment::create([
+            'user_id' => auth()->id(),
+            'post_id' => $request->post_id,
+            'parent_id' => $request->parent_id, // nullable for top-level comments
+            'content' => $request->content,
+        ]);
+        return redirect()->route('posts.show', $request->post_id)->with('success', 'Comment added!');
+    }
 }

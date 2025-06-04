@@ -6,7 +6,7 @@ use App\Models\Comment;
 use App\Models\Like;
 use App\Models\User;
 use App\Models\Post;
-use Illuminate\Support\Facades\Storage;
+use App\Helpers\Helper;
 
 class AdminController extends Controller
 {
@@ -25,18 +25,7 @@ class AdminController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
-        if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
-            Storage::disk('public')->delete($user->profile_photo);
-        }
-        $posts = Post::where('user_id', $user->id)->get();
-        foreach ($posts as $post) {
-            if ($post->image && Storage::disk('public')->exists($post->image)) {
-                Storage::disk('public')->delete($post->image);
-            }
-        }
-        Post::where('user_id', $user->id)->delete();
-        $user->delete();
-        return back()->with('success', 'User, their profile photo, and all post images deleted successfully.');
+        Helper::deleteUserAssets($user);
     }
 
     public function show($id)

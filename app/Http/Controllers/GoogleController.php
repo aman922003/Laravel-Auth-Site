@@ -22,8 +22,6 @@ class GoogleController extends Controller
     {
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
-
-            // Check if user exists with google_id
             $user = User::where('email', $googleUser->email)->first();
 
             if (!$user) {
