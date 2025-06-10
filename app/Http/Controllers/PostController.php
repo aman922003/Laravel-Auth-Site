@@ -47,7 +47,7 @@ class PostController extends Controller
     {
         // $post = Post::findOrFail($id);
         // $like = Like::all($id);
-        $post = Post::with(['user', 'comments.user', 'likes'])->findOrFail($id);
+        $post = Post::with(['user', 'comments.user', 'likes','reviews.user'])->findOrFail($id);
         return view('posts.show', ['post' => $post]);
         // return view('posts.show', ['like' => $like]);
 

@@ -16,6 +16,8 @@ class SendAllPostsEmail extends Command
     public function handle()
     {
         $posts = Post::with('user')->latest()->get();
+
+        dd(count($posts));
         $recipient = User::inRandomOrder()->first(); 
         if (!$recipient) {
             $this->error('No users found in the database.');
